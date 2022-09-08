@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/vue-select.css') }}">
+    <link rel='stylesheet' href='https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css'>
+{% endblock %}
+
+{% block title %}Hello CrudController!{% endblock %}
+
+{% block body %}
+<div id="app">
+    <button @click="crearPro()">Crear</button>
+    <h1>Listado productos</h1>
+    <div class="row">
+        <div v-for="(producto, index) in products" class="col-md-6">
+            <div class="card">
+                <div class="container">
+                    <img src="https://dummyjson.com/image/i/products/1/thumbnail.jpg">
+                    <label>Producto: </label>${ producto.title}
+                    <label>Descripcion: </label>${ producto.description}
+                    <label>Precio: </label>${ producto.price}
+                    <button @click="verPro(producto.id)">Ver</button>
+                    <button @click="eliminarPro(producto.id)">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+   
+{% endblock %}
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-vue/2.22.0/bootstrap-vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-select@3.20.0/dist/vue-select.min.js"></script>
+<script src='https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js'></script>
+<script>
+    
+    Vue.component('v-select', VueSelect.VueSelect)
+       var app = new Vue({
+           el: "#app",
+           delimiters: ['${', '}'],
+           data:{
+            products: '',
+           },
+           mounted() {
+            this.productosApi()
+           },
+           methods: {
+            async productosApi(){
+                fetch('https://dummyjson.com/products')
+                .then(res => res.json().then(response => {
+                       this.products = response.products
+                    }).catch(function(error) {
+                        console.log('Error:');
+                    }))
+            },
+            async crearPro(){
+                fetch('https://dummyjson.com/products/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: 'BMW Pencil',
+                    /* other product data */
+                })
+                })
+                .then(res => res.json())
+                .then(console.log);
+            },
+            async eliminarPro(id){
+                console.log(id)
+                let url = 'https://dummyjson.com/products/' + id
+                fetch(url, {
+                    method: 'DELETE',
+                    })
+                    .then(res => res.json())
+                    .then(console.log);
+            },
+            async verPro(id){
+                fetch('https://dummyjson.com/products/1')
+                .then(res => res.json())
+                .then(console.log);
+            },
+           },
+        })
+
+</script>
+{% endblock %}
